@@ -14,19 +14,51 @@ const router = express.Router();
 const setSort = (sort) => {
   const sortObj = {};
   switch (sort) {
-    case 'newest': {
-      sortObj.createdAt = -1;
+    case 'least': {
+      sortObj.countInStock = 1;
       return sortObj;
     }
+    case 'most': {
+      sortObj.countInStock = -1;
+      return sortObj;
+    }
+
     case 'cheaper': {
       sortObj.price = 1;
       return sortObj;
     }
-
     case 'expensive': {
       sortObj.price = -1;
       return sortObj;
     }
+
+    case 'alphabet': {
+      sortObj.name = 1;
+      return sortObj;
+    }
+    case 'reverseAlphabet': {
+      sortObj.name = -1;
+      return sortObj;
+    }
+
+    case 'brandName': {
+      sortObj.brand = 1;
+      return sortObj;
+    }
+    case 'brandNameReverse': {
+      sortObj.brand = -1;
+      return sortObj;
+    }
+
+    case 'categoryName': {
+      sortObj.category = 1;
+      return sortObj;
+    }
+    case 'categoryNameReverse': {
+      sortObj.category = -1;
+      return sortObj;
+    }
+
     default: {
       sortObj.createdAt = -1;
       return sortObj;
@@ -75,18 +107,44 @@ router.get(
 
 router.get('/', async (req, res) => {
   const query = {};
-  const category = req.query.categoryId;
-  if (category) query.category = category;
+
+  // const category = req.query.categoryId;
+  // if (category) query.category = category;
 
   const { slug } = req.query;
   const { brand } = req.query;
   if (slug) {
-    const { _id } = await Category.findOne({ name: slug });
-    query.category = _id;
+    const slugValues = req.query.slug;
+    const slugs = slugValues.split(',');
+    query.category = [];
+    for (const slug of slugs) {
+      const { _id } = await Category.findOne({ name: slug });
+      query.category.push(_id);
+    }
   }
   if (brand) {
-    const { _id } = await Brand.findOne({ name: brand });
-    query.brand = _id;
+    const brandValues = req.query.brand;
+    const brands = brandValues.split(',');
+    query.brand = [];
+    for (const brand of brands) {
+      const { _id } = await Brand.findOne({ name: brand });
+      query.brand.push(_id);
+    }
+  }
+
+  if (req.query.price) {
+    const minPrice = req.query.price.split('-')[0];
+    const maxPrice = req.query.price.split('-')[1];
+    query._id = [];
+    const y = await Product.find({});
+    const x = [...y];
+    const xx = x.filter(
+      (item) => item.price >= minPrice && item.price < maxPrice
+    );
+    const xxx = xx.map((item) => {
+      return item._id;
+    });
+    query._id.push(...xxx);
   }
 
   const options = {
@@ -98,17 +156,6 @@ router.get('/', async (req, res) => {
   const result = await Product.paginate(query, options);
   return res.status(200).json({ data: result });
 });
-
-// router.get(
-//   '/seed',
-//   // isAuth,
-//   // isAdmin,
-//   asyncHandler(async (req, res) => {
-//     console.log(data.products);
-//     const createdProducts = await Product.insertMany(data.products);
-//     res.send({ createdProducts });
-//   })
-// );
 
 router.get('/:slug', async (req, res) => {
   try {
@@ -156,5 +203,51 @@ router.post(
     });
   })
 );
+
+router.put(
+  '/:id',
+  expressAsyncHandler(async (req, res) => {
+    const form = new formidable.IncomingForm();
+    form.parse(req, async (err, fields, files) => {
+      const imagePath = `/image/${files.image.originalFilename}`;
+      const image = fs.readFileSync(files.image.filepath);
+      fs.writeFileSync(`./public${imagePath}`, image);
+
+      const product = await Product.findByIdAndUpdate(req.body._id, {
+        name: fields.name,
+        slug: fields.slug,
+        category: fields.category,
+        image: imagePath,
+        price: fields.price,
+        brand: fields.brand,
+        rating: 4.5,
+        numReviews: 10,
+        countInStock: fields.countInStock,
+        description: fields.description,
+      });
+      return res.status(200).json({
+        data: product,
+        message: 'Product is updated successfully',
+        persianMessage: 'محصول جدید با موفقیت ثبت شد',
+      });
+    });
+  })
+);
+
+router.delete('/:id', async (req, res) => {
+  const theProduct = await Product.findByIdAndDelete(req.params.id);
+  if (theProduct) {
+    res.status(200).json({
+      message: 'Deleted successfully',
+      persianMessage: 'محصول جدید با موفقیت حذف شد',
+      data: theProduct,
+    });
+  } else {
+    res.status(404).send({
+      message: 'Product not exist',
+      persianMessage: 'محصول مورد نظر وجود ندارد',
+    });
+  }
+});
 
 export default router;

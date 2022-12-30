@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
-
+import { userSchema } from './User.js';
 const orderSchema = new mongoose.Schema(
   {
     orderItems: [
@@ -36,9 +36,13 @@ const orderSchema = new mongoose.Schema(
     paidAt: { type: Date },
     delieveredAt: { type: Date },
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
+      name: { type: String, required: true },
+      email: { type: String, required: true, unique: false },
+      isAdmin: { type: Boolean, default: false, required: true },
+      persianCreatedAt: { type: String, required: true },
+      time: { type: String, required: true },
+      // type: mongoose.Schema.Types.ObjectId,
+      // ref: 'User',
     },
   },
 

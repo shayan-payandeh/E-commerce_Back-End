@@ -15,6 +15,76 @@ import cookie from 'cookie';
 
 const router = express.Router();
 
+const setSort = (sort) => {
+  const sortObj = {};
+  switch (sort) {
+    case 'alphabetName': {
+      sortObj.name = 1;
+      return sortObj;
+    }
+    case 'reverseAlphabetName': {
+      sortObj.name = -1;
+      return sortObj;
+    }
+
+    case 'alphabetEmail': {
+      sortObj.email = 1;
+      return sortObj;
+    }
+    case 'reverseAlphabetEmail': {
+      sortObj.email = -1;
+      return sortObj;
+    }
+
+    case 'userFirst': {
+      sortObj.isAdmin = 1;
+      return sortObj;
+    }
+    case 'adminFirst': {
+      sortObj.isAdmin = -1;
+      return sortObj;
+    }
+
+    case 'oldest': {
+      sortObj.createdAt = 1;
+      return sortObj;
+    }
+    case 'newest': {
+      sortObj.createdAt = -1;
+      return sortObj;
+    }
+
+    default: {
+      sortObj.createdAt = -1;
+      return sortObj;
+    }
+  }
+};
+
+router.get(
+  '/',
+  // isAuth,
+  // isAdmin,
+  asyncHandler(async (req, res) => {
+    const query = {};
+    if (req.query.isAdmin) {
+      query._id = [];
+      const allUsers = await User.find();
+      const isAdmin = req.query.isAdmin === 'true' ? true : false;
+      const filteredUsers = allUsers.filter((user) => user.isAdmin === isAdmin);
+      const usersId = filteredUsers.map((user) => user._id);
+      query._id.push(...usersId);
+    }
+    const options = {
+      page: parseInt(req.query.page) || 1,
+      limit: parseInt(req.query.limit) || 9,
+      sort: {},
+    };
+    options.sort = req.query.sort ? setSort(req.query.sort) : {};
+    const result = await User.paginate(query, options);
+    res.send({ data: result });
+  })
+);
 router.get(
   '/seed',
   // isAuth,
@@ -28,6 +98,7 @@ router.get(
 router.post(
   '/register',
   asyncHandler(async (req, res) => {
+    console.log(req.body);
     const { error } = registerValidation(req.body);
     if (error)
       return res.status(400).json({ message: error.details[0].message });
@@ -114,12 +185,10 @@ router.post(
 
     const user = await User.findOne({ email: req.body.email.toLowerCase() });
     if (!user)
-      return res
-        .status(400)
-        .json({
-          message: 'Invalid Email/Password',
-          persianMessage: 'ایمیل یا رمز عبور اشتباه است',
-        });
+      return res.status(400).json({
+        message: 'Invalid Email/Password',
+        persianMessage: 'ایمیل یا رمز عبور اشتباه است',
+      });
     const validPass = await bcrypt.compareSync(
       req.body.password,
       user.password

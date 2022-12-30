@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
-const userSchema = mongoose.Schema(
+export const userSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -25,4 +26,5 @@ userSchema.methods.toJSON = function () {
   return obj;
 };
 
+userSchema.plugin(mongoosePaginate);
 export default mongoose.model('User', userSchema);

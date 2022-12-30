@@ -37,9 +37,7 @@ mongoose.set('useCreateIndex', true);
 // const origin =
 //   process.env.NODE_ENV === 'development' ? 'http://localhost:1500' : 'https://';
 const origin =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:1500'
-    : 'https://fronthooks.ir';
+  process.env.NODE_ENV === 'development' ? 'http://localhost:1500' : '';
 
 // app.use(cors({ credentials: true, origin }));
 app.use(cors());

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 const brandSchema = new mongoose.Schema(
   {
@@ -8,5 +9,7 @@ const brandSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+brandSchema.plugin(mongoosePaginate);
 
 export default mongoose.model('Brand', brandSchema);
