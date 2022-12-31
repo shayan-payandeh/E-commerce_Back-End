@@ -3,10 +3,10 @@ import expressAsyncHandler from 'express-async-handler';
 import formidable from 'formidable';
 import fs from 'fs';
 import shortid from 'shortid';
-import Brand from '../models/Brand.js';
-import Category from '../models/Category.js';
-import order from '../models/Order.js';
-import Product from '../models/Product.js';
+import Brand from '../models/Brand';
+import Category from '../models/Category';
+import order from '../models/Order';
+import Product from '../models/Product';
 import { isAuth, isAdmin } from '../utils.js';
 
 const router = express.Router();
