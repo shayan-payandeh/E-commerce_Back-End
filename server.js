@@ -17,8 +17,12 @@ app.use(express.json()); // parses application/json
 app.use(express.urlencoded({ extended: true })); // parses application/x-www-form-urlencoded
 
 // Connect to DB
+const uri =
+  process.env.NODE_ENV === 'development'
+    ? process.env.MONGO_URI
+    : process.env.MONGO_URI_PRODUCTION;
 mongoose
-  .connect(process.env.MONGO_URI, {
+  .connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
