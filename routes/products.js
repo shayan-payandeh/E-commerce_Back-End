@@ -3,10 +3,10 @@ import expressAsyncHandler from 'express-async-handler';
 import formidable from 'formidable';
 import fs from 'fs';
 import shortid from 'shortid';
-import Brand from '../models/Brand';
-import Category from '../models/Category';
-import order from '../models/Order';
-import Product from '../models/Product';
+import Brand from '../models/Brand.js';
+import Category from '../models/Category.js';
+import Order from '../models/Order.js';
+import Product from '../models/Product.js';
 import { isAuth, isAdmin } from '../utils.js';
 
 const router = express.Router();
@@ -69,7 +69,7 @@ const setSort = (sort) => {
 router.get(
   '/bestselling',
   expressAsyncHandler(async (req, res) => {
-    const orders = await order.find();
+    const orders = await Order.find();
     const products = await Product.find();
     const arrayOfItems = [];
     for (const order of orders) {
