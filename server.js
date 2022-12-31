@@ -60,11 +60,11 @@ app.use((req, res, next) => {
 app.use(
   cookieParser(process.env.COOKIE_PARSER_SECRET || 'COOKIE PARSER SECRET')
 );
-app.use('/api/user', userRouter);
-app.use('/api/products', productRouter);
-app.use('/api/category', categoryRouter);
-app.use('/api/brand', brandRouter);
-app.use('/api/order', orderRouter);
+app.use('/user', userRouter);
+app.use('/products', productRouter);
+app.use('/category', categoryRouter);
+app.use('/brand', brandRouter);
+app.use('/order', orderRouter);
 // app.use("/api/posts", postRouter);
 // app.use("/api/post-category", postCategoryRouter);
 // app.use("/api/post-comment", postCommentRouter);
