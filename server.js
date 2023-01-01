@@ -40,8 +40,6 @@ mongoose.set('useCreateIndex', true);
 // //? Router middleware :
 // const origin =
 //   process.env.NODE_ENV === 'development' ? 'http://localhost:1500' : 'https://';
-const origin =
-  process.env.NODE_ENV === 'development' ? 'http://localhost:1500' : '';
 
 // app.use(cors({ credentials: true, origin }));
 app.use(cors());
@@ -60,14 +58,12 @@ app.use((req, res, next) => {
 app.use(
   cookieParser(process.env.COOKIE_PARSER_SECRET || 'COOKIE PARSER SECRET')
 );
-app.use('/user', userRouter);
-app.use('/products', productRouter);
-app.use('/category', categoryRouter);
-app.use('/brand', brandRouter);
-app.use('/order', orderRouter);
-// app.use("/api/posts", postRouter);
-// app.use("/api/post-category", postCategoryRouter);
-// app.use("/api/post-comment", postCommentRouter);
+const apiAddress = process.env.NODE_ENV === 'development' ? '/api' : '';
+app.use(`${apiAddress}/user`, userRouter);
+app.use(`${apiAddress}/products`, productRouter);
+app.use(`${apiAddress}/category`, categoryRouter);
+app.use(`${apiAddress}/brand`, brandRouter);
+app.use(`${apiAddress}/order`, orderRouter);
 
 //? PORT
 const port = process.env.PORT || 1500;
