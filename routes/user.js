@@ -98,10 +98,9 @@ router.get(
 router.post(
   '/register',
   asyncHandler(async (req, res) => {
-    console.log(req.body);
-    const { error } = registerValidation(req.body);
-    if (error)
-      return res.status(400).json({ message: error.details[0].message });
+    // const { error } = registerValidation(req.body);
+    // if (error)
+    //   return res.status(400).json({ message: error.details[0].message });
 
     // validate user data
     // const { error } = registerValidation(req.body);
@@ -141,19 +140,24 @@ router.post(
       persianCreatedAt: `${persianDate}`,
       time: `${hour}:${min}`,
     });
-
+    console.log('user');
     const savedUser = await user.save();
     const token = generateToken(user);
+    console.log('token');
     if (savedUser) {
-      res.status(200).json({
-        token,
-        _id: savedUser._id,
-        name: savedUser.name,
-        email: savedUser.email,
-        isAdmin: savedUser.isAdmin,
+      return res.status(200).json({
+        message: 'Added successfully',
+        persianMessage: 'کاربر جدید با موفقیت ثبت شد',
+        data: {
+          token: token,
+          _id: savedUser._id,
+          name: savedUser.name,
+          email: savedUser.email,
+          isAdmin: savedUser.isAdmin,
+        },
       });
     } else {
-      res.status(400).send(error);
+      return res.status(400).send(error);
     }
 
     // try {

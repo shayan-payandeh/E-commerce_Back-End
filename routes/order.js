@@ -1,7 +1,6 @@
 import express, { query } from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import Order from '../models/Order.js';
-import Product from '../models/Product.js';
 import User from '../models/User.js';
 import { isAdmin, isAuth } from '../utils.js';
 
@@ -88,10 +87,12 @@ router.get(
     //   $and: [{ user: req.user._id }, { isPaid: true }],
     // });
     const query = {};
+    query._id = [];
     const allOrders = await Order.find();
     const theOrdersId = allOrders
-      .filter((order) => order.user._id === req.user._id)
+      .filter((order) => order.user.email === req.user.email)
       .map((item) => item._id);
+    query._id.push(...theOrdersId);
     const options = {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 5,
